@@ -35,11 +35,9 @@ jobs:
 
       - name: Clone source code
         run: |
-          GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
-          git clone https://github.com/Meekdai/Gmeek.git /opt/Gmeek;
-          cd /opt/Gmeek/
-          lastTag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          if [ $GMEEK_VERSION == 'last' ]; then git checkout $lastTag; else git checkout $GMEEK_VERSION; fi;
+          git clone https://github.com/shangkouyou/Gmeek-YSJ.git /opt/Gmeek
+          cd /opt/Gmeek
+          git checkout main  # 切换到主分支，替换为您的默认分支名
 
       - name: Install dependencies
         run: |
@@ -55,19 +53,19 @@ jobs:
           cp -a /opt/Gmeek/backup ${{ github.workspace }} 
           cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
           
-      - name: update html
+      - name: Update html
         run: |
           git config --local user.email "$(jq -r ".email" config.json)"
           git config --local user.name "${{ github.repository_owner }}"
           git add .
-          git commit -a -m '🎉auto update by Gmeek action' || echo "nothing to commit"
+          git commit -m '🎉 auto update by Gmeek action' || echo "nothing to commit"
           git push || echo "nothing to push"
           sleep 3
           
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
-          path: 'docs/.'
+          path: 'docs'
           
   deploy:
     name: Deploy blog
@@ -85,5 +83,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
