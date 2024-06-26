@@ -6,7 +6,7 @@ on:
     types: [opened, edited]
   schedule:
     - cron: "0 16 * * *"
-    
+
 jobs:
   build:
     name: Generate blog
@@ -23,10 +23,10 @@ jobs:
 
       - name: Get config.json
         run: |
-          echo "====== check config.josn file ======"
+          echo "====== check config.json file ======"
           cat config.json
-          echo "====== check config.josn end  ======"
-          sudo apt-get install jq
+          echo "====== check config.json end ======"
+          sudo apt-get install -y jq
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,7 +37,7 @@ jobs:
         run: |
           git clone https://github.com/shangkouyou/Gmeek-YSJ.git /opt/Gmeek
           cd /opt/Gmeek
-          git checkout main  # 切换到主分支，替换为您的默认分支名
+          git checkout main  # 确保您使用的是 main 分支
 
       - name: Install dependencies
         run: |
@@ -49,11 +49,11 @@ jobs:
           cp -r ./* /opt/Gmeek/
           cd /opt/Gmeek/
           python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
-          cp -a /opt/Gmeek/docs ${{ github.workspace }} 
-          cp -a /opt/Gmeek/backup ${{ github.workspace }} 
-          cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
-          
-      - name: Update html
+          cp -a /opt/Gmeek/docs ${{ github.workspace }}/docs
+          cp -a /opt/Gmeek/backup ${{ github.workspace }}/backup
+          cp /opt/Gmeek/blogBase.json ${{ github.workspace }}/blogBase.json
+
+      - name: Commit and push changes
         run: |
           git config --local user.email "$(jq -r ".email" config.json)"
           git config --local user.name "${{ github.repository_owner }}"
@@ -61,12 +61,13 @@ jobs:
           git commit -m '🎉 auto update by Gmeek action' || echo "nothing to commit"
           git push || echo "nothing to push"
           sleep 3
-          
+
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          path: 'docs'
-          
+          name: github-pages
+          path: 'docs/.'
+
   deploy:
     name: Deploy blog
     runs-on: ubuntu-20.04
@@ -80,7 +81,7 @@ jobs:
       cancel-in-progress: false
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
