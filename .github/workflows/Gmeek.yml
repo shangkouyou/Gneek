@@ -44,6 +44,10 @@ jobs:
           pip install --upgrade pip
           pip install -r /opt/Gmeek/requirements.txt
 
+      - name: Create backup directory
+        run: |
+          mkdir -p /opt/Gmeek/backup
+
       - name: Generate new html
         run: |
           cp -r ./* /opt/Gmeek/
