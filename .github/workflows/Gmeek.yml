@@ -51,8 +51,10 @@ jobs:
           python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
           mkdir -p ${{ github.workspace }}/docs
           cp -a /opt/Gmeek/docs/* ${{ github.workspace }}/docs/
-          mkdir -p ${{ github.workspace }}/backup
-          cp -a /opt/Gmeek/backup/* ${{ github.workspace }}/backup/
+          if [ -d "/opt/Gmeek/backup" ]; then
+            mkdir -p ${{ github.workspace }}/backup
+            cp -a /opt/Gmeek/backup/* ${{ github.workspace }}/backup/
+          fi
           cp /opt/Gmeek/blogBase.json ${{ github.workspace }}/blogBase.json
 
       - name: Commit and push changes
