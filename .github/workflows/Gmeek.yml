@@ -49,8 +49,8 @@ jobs:
           cp -r ./* /opt/Gmeek/
           cd /opt/Gmeek/
           python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
-          cp -a /opt/Gmeek/docs ${{ github.workspace }}/docs
-          cp -a /opt/Gmeek/backup ${{ github.workspace }}/backup
+          cp -a /opt/Gmeek/docs/* ${{ github.workspace }}/docs/
+          cp -a /opt/Gmeek/backup/* ${{ github.workspace }}/backup/
           cp /opt/Gmeek/blogBase.json ${{ github.workspace }}/blogBase.json
 
       - name: Commit and push changes
@@ -66,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: github-pages
-          path: 'docs/.'
+          path: docs
 
   deploy:
     name: Deploy blog
